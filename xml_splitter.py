@@ -15,11 +15,13 @@ class XMLSplitter:
         matches_cF = pattern_for_cF.findall(xml_data)
         
         if matches_cF:
-            cF_dir = os.path.join(os.path.dirname(input_file), 'analizing_data', 'conditionalFormatting')
+            cF_dir = os.path.join(output_directory, 'conditionalFormatting')
             os.makedirs(cF_dir, exist_ok=True)
             with open(os.path.join(cF_dir, f'{os.path.splitext(os.path.basename(input_file))[0]}.xml'), 'w', encoding='utf-8') as f:
+                f.write('<conditionalFormattings>\n')
                 for match in matches_cF:
                     f.write(match + '\n')
+                f.write('</conditionalFormattings>\n')
 
         # Блок для разделения элементов в <sheetData>
         dimension_pattern = re.compile(r'<dimension ref="([^"]+)"')
