@@ -1,8 +1,9 @@
 import os
 import re
 from lxml import etree
-from multiprocessing import Pool, Manager, Lock
+from multiprocessing import Pool
 from range_convertor import RangeConvertor
+from extract_ooxml_object_info import ExtractObjectInfo
 
 class SheetCellsParser:
     def __init__(self, sheet_folder, external_link_paths):
@@ -106,7 +107,7 @@ class SheetCellsParser:
         except Exception as e:
                 print(f"Ошибка при анализе файла {file}: {e}")
 
-    def analyze_folder(self):
+    def analyze_folder(self, extract_objects):
         
         if self.sheet_folder is not None:
 
@@ -148,9 +149,11 @@ class SheetCellsParser:
 
                 
 
-                name_folder = os.path.basename(self.sheet_folder)
-                print(name_folder)
-                print(f"Количество ячеек с формулой в {name_folder}: {total_formula_cell_count}")
+                sheet_id = os.path.basename(self.sheet_folder)[5:]
+                name_sheet = extract_objects.get_sheet_name(sheet_id)
+
+                print(f'Лист - {name_sheet}')
+                print(f"Количество ячеек с формулой на листе {name_sheet}: {total_formula_cell_count}")
                 print("Количество использований функций:")
                 for function, count in total_function_counts.items():
                     print(f"{function}: {count} раз(а)")
@@ -158,20 +161,22 @@ class SheetCellsParser:
                 print(f"Количество текстовых ячеек: {total_text_cells}")
                 print(f"Количество пустых ячеек: {total_empty_cells}")
                 print(f"Количество внешних ссылок: {self.total_count_external_link}")
-                print('\n')
+                
+                print(f"Общее количество правил условного форматирований: {self.total_cf_count}")
+                if self.total_cf_count:
+                    print("Распределение по типу форматирования:")
+                    for cf_type, count in self.cf_type_counts.items():
+                        print(f"Тип: {cf_type}, Количество: {count}")
 
-                print(f"\nОбщее количество правил условного форматирований: {self.total_cf_count}")
-                print("Распределение по типу форматирования:")
-                for cf_type, count in self.cf_type_counts.items():
-                    print(f"Тип: {cf_type}, Количество: {count}")
-
-                for data in self.formatted_data:
-                    print(f"Диапазон: {data['sqref']}, Тип форматирования: {data['rule_type']}")
+                    for data in self.formatted_data:
+                        print(f"Диапазон: {data['sqref']}, Тип форматирования: {data['rule_type']}")
 
 
                 if self.total_count_external_link != 0:
                     print("___________Список файлов на которые добавлены внешние ссылки___________")
                     for index, count in self.updated_result_for_sheet.items():
                         print(f"Ссылка на документ: {index}, Количество ячеек: {count}")
+
+                print('\n')
 
 

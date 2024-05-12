@@ -23,5 +23,5 @@ class Analyzer:
                 split_sheet_dir = XMLSplitter.split_sheetdata(sheet_file)  # Получаем папку с данными для каждого листа
                 xml_parser = SheetCellsParser(split_sheet_dir, self.external_link_paths)
                 sys.stdout = file
-                xml_parser.analyze_folder()  
+                xml_parser.analyze_folder(self.extract_objects)  
                 sys.stdout = sys.__stdout__
