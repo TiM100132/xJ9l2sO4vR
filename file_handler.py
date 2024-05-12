@@ -22,7 +22,7 @@ class FileHandler:
                 if filename.endswith('.xml'):
                     xml_file_paths.append(os.path.join(sheets_dir, filename))
      
-            return xml_file_paths
+            return xml_file_paths, self.temp_dir
     
         except Exception as e:
             print(f"Ошибка при обработке XLSX файла: {e}")
